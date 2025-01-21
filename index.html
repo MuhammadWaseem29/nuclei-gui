@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuclei Web GUI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        #output {
+            white-space: pre-wrap;
+            background: #f4f4f4;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nuclei Web GUI</h1>
+    <input type="file" id="fileInput" accept=".txt">
+    <br><br>
+    <button onclick="runCommand()">Run</button>
+
+    <h2>Output:</h2>
+    <div id="output">Results will appear here...</div>
+
+    <script>
+        async function runCommand() {
+            const fileInput = document.getElementById('fileInput');
+            const outputDiv = document.getElementById('output');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                alert("Please upload a file!");
+                return;
+            }
+
+            outputDiv.textContent = "Running...";
+
+            try {
+                // Read the file content
+                const file = fileInput.files[0];
+                const fileContent = await file.text();
+
+                // Send the file content to the backend
+                // const response = await fetch('http://127.0.0.1:5000/run-nuclei', {
+                const response = await fetch('http://64.227.23.58/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ urls: fileContent }),
+                });
+
+                // Log the response
+                console.log("Response:", response);
+
+                const data = await response.json();
+
+                // Log the data
+                console.log("Data:", data);
+
+                if (data.error) {
+                    outputDiv.textContent = `Error: ${data.error}`;
+                } else {
+                    outputDiv.textContent = data.stdout || data.stderr;
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                outputDiv.textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

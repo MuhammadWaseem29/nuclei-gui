@@ -1,0 +1,2 @@
+https://cwse-plugin-uat.dev.rmm.bitdefender.com
+https://dev-test.skroutz.grss
